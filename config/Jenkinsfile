@@ -36,6 +36,6 @@ node {
 		sh "docker rm ${project_name}-test"
 		sh "docker rmi -f ${harbor_url}/${project_name}/${imageName}"
 		sh "echo 启动镜像服务"
-		sh "docker run -d -p:10010:8888 --name ${project_name}-test gencode:1.0"
+		sh "docker run -d -p:8081:8081 --name ${project_name}-test gencode:1.0"
 	}
 }
