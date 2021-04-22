@@ -11,9 +11,9 @@ def harbor_auth = "974df856-f2b5-4126-ab7a-267af5e15f98"
 
 node {
 	stage('拉取代码') {
-	    sh "*******开始拉取代码*********"
+	    sh "echo *******开始拉取代码*********"
 		checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '9047bf42-b6da-425a-9783-d4d7c69f0290', url: 'https://github.com/guojun5642940/jenkins.git']]])
-	    sh "*******代码拉取结束*********"
+	    sh "echo *******代码拉取结束*********"
 	}
 	stage('编译，构建镜像') {
 		//定义镜像名称
