@@ -26,7 +26,7 @@ node {
 		sh "mvn package -Dmaven.test.skip=true docker:build"
 
 		//给镜像打标签
-		sh "docker tag ${imageName} ${harbor_url}/${project_name}/${imageName}"
+		sh "docker tag ${harbor_url}/${project_name} ${harbor_url}/${imageName}"
 
 		//登录Harbor，并上传镜像
 		withCredentials([usernamePassword(credentialsId: "${harbor_auth}", passwordVariable: 'password', usernameVariable: 'username')]) {
