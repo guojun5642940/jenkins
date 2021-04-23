@@ -16,14 +16,18 @@ node {
 	    sh "echo *******代码拉取结束*********"
 	}
 	stage('编译，构建镜像') {
-		//定义镜像名称
 		def imageName = "${project_name}:${tag}"
-		//编译，安装公共工程
-		//sh "mvn -f tensquare_common clean install"
+		sh "echo 镜像名: ${imageName} "
+
 		//编译，构建本地镜像
-		sh "mvn clean package dockerfile:build"
+		//sh "mvn clean package dockerfile:build"
+
+        //切换项目目录下执行mvn package -Dmaven.test.skip=true docker:build
+		sh "mvn package -Dmaven.test.skip=true docker:build"
+
 		//给镜像打标签
 		sh "docker tag ${imageName} ${harbor_url}/${project_name}/${imageName}"
+
 		//登录Harbor，并上传镜像
 		withCredentials([usernamePassword(credentialsId: "${harbor_auth}", passwordVariable: 'password', usernameVariable: 'username')]) {
 			//登录
@@ -32,12 +36,19 @@ node {
 			sh "docker push ${harbor_url}/${project_name}/${imageName}"
 			sh "echo 镜像上传成功"
 		}
+
 		//删除本地镜像
 		sh "docker rmi -f ${imageName}"
+
 		sh "docker stop ${project_name}-test"
+
 		sh "docker rm ${project_name}-test"
+
 		sh "docker rmi -f ${harbor_url}/${project_name}/${imageName}"
+
 		sh "echo 启动镜像服务"
+
 		sh "docker run -d -p:8081:8081 --name ${project_name}-test gencode:1.0"
+
 	}
 }
