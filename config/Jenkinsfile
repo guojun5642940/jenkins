@@ -33,7 +33,7 @@ node {
 			//登录
 			sh "docker login -u ${username} -p ${password} ${harbor_url}"
 			//上传镜像
-			sh "docker push ${harbor_url}/${project_name}/${imageName}"
+			sh "docker push ${harbor_url}/${imageName}"
 			sh "echo 镜像上传成功"
 		}
 
