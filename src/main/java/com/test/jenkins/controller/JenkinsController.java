@@ -15,6 +15,6 @@ public class JenkinsController {
 
     @RequestMapping("/test")
     public String test(){
-        return "hello world----2";
+        return "hello world----5555";
     }
 }
