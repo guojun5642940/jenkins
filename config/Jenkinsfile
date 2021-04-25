@@ -17,8 +17,6 @@ node {
 	}
 	stage('编译，构建镜像') {
 
-        sh "docker stop ${project_name}-test"
-
 		//编译，构建本地镜像
 		//sh "mvn clean package dockerfile:build"
 
