@@ -15,25 +15,12 @@ node {
 		checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '9047bf42-b6da-425a-9783-d4d7c69f0290', url: 'https://github.com/guojun5642940/jenkins.git']]])
 	    sh "echo *******代码拉取结束*********"
 	}
+
 	stage('编译，构建镜像') {
 
-		//编译，构建本地镜像
-		//sh "mvn clean package dockerfile:build"
+	    sh "docker stop ${harbor_url}/${project_name}/myjenkins:${tag}"
 
-        //切换项目目录下执行mvn package -Dmaven.test.skip=true docker:build
 		sh "mvn package -Dmaven.test.skip=true docker:build"
-
-		//给镜像打标签
-		sh "docker tag ${harbor_url}/${project_name} ${harbor_url}/${project_name}/myjenkins:${tag}"
-
-		//登录Harbor，并上传镜像
-		withCredentials([usernamePassword(credentialsId: "${harbor_auth}", passwordVariable: 'password', usernameVariable: 'username')]) {
-			//登录
-			sh "docker login -u ${username} -p ${password} ${harbor_url}"
-			//上传镜像
-			sh "docker push ${harbor_url}/${project_name}/myjenkins:${tag}"
-			sh "echo imageName upload Success"
-		}
 
 		sh "echo ******run image*******"
 
