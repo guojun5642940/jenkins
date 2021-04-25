@@ -17,7 +17,10 @@ node {
 	}
 	stage('编译，构建镜像') {
 		def imageName = "${project_name}:${tag}"
-		sh "echo 镜像名: ${imageName} "
+		sh "echo imageName------->: ${imageName} "
+
+		//删除本地镜像
+        sh "docker rmi -f ${harbor_url}/${imageName}/myJenkins"
 
 		//编译，构建本地镜像
 		//sh "mvn clean package dockerfile:build"
@@ -26,29 +29,26 @@ node {
 		sh "mvn package -Dmaven.test.skip=true docker:build"
 
 		//给镜像打标签
-		sh "docker tag ${harbor_url}/${project_name} ${harbor_url}/${imageName}"
+		sh "docker tag ${harbor_url}/${project_name} ${harbor_url}/${imageName}/myJenkins"
 
 		//登录Harbor，并上传镜像
 		withCredentials([usernamePassword(credentialsId: "${harbor_auth}", passwordVariable: 'password', usernameVariable: 'username')]) {
 			//登录
 			sh "docker login -u ${username} -p ${password} ${harbor_url}"
 			//上传镜像
-			sh "docker push ${harbor_url}/${imageName}"
-			sh "echo 镜像上传成功"
+			sh "docker push ${harbor_url}/${imageName}/myJenkins:${tag}"
+			sh "echo imageName upload Success"
 		}
 
-		//删除本地镜像
-		sh "docker rmi -f ${imageName}"
+		//sh "docker stop ${project_name}-test"
 
-		sh "docker stop ${project_name}-test"
+		//sh "docker rm ${project_name}-test"
 
-		sh "docker rm ${project_name}-test"
+		//sh "docker rmi -f ${harbor_url}/${project_name}/${imageName}"
 
-		sh "docker rmi -f ${harbor_url}/${project_name}/${imageName}"
+		sh "echo ******run image*******"
 
-		sh "echo 启动镜像服务"
-
-		sh "docker run -d -p:8081:8081 --name ${project_name}-test gencode:1.0"
+		sh "docker run -d -p:8081:8081 --name ${project_name}-test ${harbor_url}/${imageName}/myJenkins"
 
 	}
 }
