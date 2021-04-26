@@ -18,7 +18,9 @@ node {
 
 	stage('编译，构建镜像') {
 
-	    //sh "docker stop ${harbor_url}/${project_name}/myjenkins:${tag}"
+        //查找正在运行的容易并停止、删除
+	    sh 'docker ps -f name=runningJenkins -q | xargs --no-run-if-empty docker container stop'
+        sh 'docker container ls -a -fname=runningJenkins -q | xargs -r docker container rm'
 
 		sh "mvn package -Dmaven.test.skip=true docker:build"
 
@@ -26,6 +28,6 @@ node {
 
 		//sh "docker run -d -p:8081:8081 ${harbor_url}/${project_name}/myjenkins:${tag}"
 
-		sh "docker run -d -p:8081:8081 ${harbor_url}/${project_name}:${tag}"
+		sh "docker run -d -p:8081:8081 --name runningJenkins  ${harbor_url}/${project_name}:${tag}"
 	}
 }
