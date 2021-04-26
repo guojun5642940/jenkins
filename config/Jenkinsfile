@@ -18,9 +18,14 @@ node {
 
 	stage('编译，构建镜像') {
 
-        //查找正在运行的容易并停止、删除
-	    sh 'docker ps -f name=runningJenkins -q | xargs --no-run-if-empty docker container stop'
-        sh 'docker container ls -a -fname=runningJenkins -q | xargs -r docker container rm'
+        //查找正在运行的容易并停止、删除。（*******linux和mac 关于xargs 语法不一样）
+        //linux - start
+	    //sh 'docker ps -f name=runningJenkins -q | xargs --no-run-if-empty docker container stop'
+        //sh 'docker container ls -a -fname=runningJenkins -q | xargs -r docker container rm'
+        //linux - end
+
+        sh 'docker ps -f name=runningJenkins -q | xargs docker container stop'
+        sh 'docker container ls -a -fname=runningJenkins -q | xargs docker container rm'
 
 		sh "mvn package -Dmaven.test.skip=true docker:build"
 
