@@ -24,6 +24,8 @@ node {
 
 		sh "echo ******run image*******"
 
-		sh "docker run -d -p:8081:8081 ${harbor_url}/${project_name}/myjenkins:${tag}"
+		//sh "docker run -d -p:8081:8081 ${harbor_url}/${project_name}/myjenkins:${tag}"
+
+		sh "docker run -d -p:8081:8081 ${harbor_url}/${project_name}:${tag}"
 	}
 }
