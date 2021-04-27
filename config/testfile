@@ -1,1 +1,38 @@
-1234git
+//gitlab的凭证
+def git_auth = "9047bf42-b6da-425a-9783-d4d7c69f0290"
+//构建版本的名称
+def tag = "latest"
+//Harbor私服地址
+def harbor_url = "192.168.66.102:85"
+//Harbor的项目名称
+def project_name = "jenkins_test"
+//Harbor的凭证
+def harbor_auth = "974df856-f2b5-4126-ab7a-267af5e15f98"
+
+node {
+	stage('拉取代码') {
+	    sh "echo *******开始拉取代码*********"
+		checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '9047bf42-b6da-425a-9783-d4d7c69f0290', url: 'https://github.com/guojun5642940/jenkins.git']]])
+	    sh "echo *******代码拉取结束*********"
+	}
+
+	stage('编译，构建镜像') {
+
+        //查找正在运行的容易并停止、删除。（*******linux和mac 关于xargs 语法不一样）
+        //linux - start
+	    //sh 'docker ps -f name=runningJenkins -q | xargs --no-run-if-empty docker container stop'
+        //sh 'docker container ls -a -fname=runningJenkins -q | xargs -r docker container rm'
+        //linux - end
+
+        sh 'docker ps -f name=runningJenkins -q | xargs docker container stop'
+        sh 'docker container ls -a -fname=runningJenkins -q | xargs docker container rm'
+
+		sh "mvn package -Dmaven.test.skip=true docker:build"
+
+		sh "echo ******run image*******"
+
+		//sh "docker run -d -p:8081:8081 ${harbor_url}/${project_name}/myjenkins:${tag}"
+
+		sh "docker run -d -p:8081:8081 --name runningJenkins  ${harbor_url}/${project_name}:${tag}"
+	}
+}
